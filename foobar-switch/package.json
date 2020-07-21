@@ -1,0 +1,23 @@
+{
+  "name": "foobar-switch",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "./node_modules/typescript/bin/tsc",
+    "start": "node dist/foobar-switch/src/server.js",
+    "debug": "node -- inspect=5858 -r ts-node/register ./src/server.ts",
+    "debug:watch": "nodemon",
+    "test": "jest",
+    "version": "node -p \"require('./package.json').version\""
+  },
+  "author": "Jack",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "node-fetch": "^2.6.0"
+  }
+}
