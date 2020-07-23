@@ -95,7 +95,7 @@ class HttpSwitchServer {
         //resheaders["content-type"] = "text/html; charset=UTF-8"
         response.status(result.status);
         response.header(resheaders);
-        response.send(result.body);
+        response.send(await result.text());
 
     }
     private async forwardRequest(request: express.Request, response: express.Response) {
@@ -109,15 +109,15 @@ class HttpSwitchServer {
         const resheaders: { [key: string]: string } = {};
         for (var pair of result.headers.entries()) {
             LOG.debug(`response header=${pair[0]} : ${pair[1]}`)
-            if (pair[0] == "connection") {
-                continue;
-            }
+            //if (pair[0] == "connection") {
+            //    continue;
+            //}
             resheaders[pair[0]] = pair[1].replace(/;\s*$/, "");
 
         }
         response.status(result.status);
         response.header(resheaders);
-        response.send(result.body);
+        response.send(await result.text());
 
     }
     private matches(options: IQueryOptions, request: express.Request): boolean {
