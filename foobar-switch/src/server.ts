@@ -28,7 +28,7 @@ class FoobarHttpSwitchServer extends HttpSwitchServer {
     public constructor() {
         super({ port: 8888, remoteUrl: "http://10.20.0.180:8889" });
         const self = this;
-        this.registerCallback({ url: "cmd=Volume" }, {
+        this.registerCallback({ queryParams: { "cmd": "Volume" } }, {
             callback(options: IQueryOptions, request: express.Request) {
                 LOG.debug(`request called for ${JSON.stringify(options)} with query params=${JSON.stringify(request.query)}`);
                 const params = request.query;

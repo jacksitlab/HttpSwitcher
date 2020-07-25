@@ -8,10 +8,14 @@ import { resolveTxt } from "dns";
 export interface IHttpCallback {
     callback(options: IQueryOptions, request: express.Request): void;
 }
+/**
+ * logical and connected
+ * so every parameter has to match
+ * if you needed create multiple callback querys with different options
+ */
 export interface IQueryOptions {
-    url?: string;
     uri?: string;
-    queryParams?: string[];
+    queryParams?: { [key: string]: string | null };
 }
 const LOG = logService.getLog('HttpSwitchServer');
 class HttpSwitchServer {
@@ -123,15 +127,44 @@ class HttpSwitchServer {
     private matches(options: IQueryOptions, request: express.Request): boolean {
         const idx = request.url.indexOf("?");
         const uri = idx < 0 ? request.url : request.url.substring(0, idx);
-        const query = request.query;
-        if (options.url) {
-            LOG.debug(`test match for ${request.url} and ${options.url}`)
-            if (request.url.indexOf(options.url) > -1) {
+        let matches = true;
+        //no filter enabled => no callback
+        if (!options.uri && !options.queryParams) {
+            return false;
+        }
+        if (options.uri) {
+            LOG.debug(`test match for ${request.url} and ${options.uri}`)
+            if (request.url.indexOf(options.uri) > -1) {
                 LOG.debug("match")
-                return true;
+                matches = true;
             }
         }
-        return false;
+        if (options.queryParams) {
+            Object.keys(options.queryParams).forEach((queryParamKey) => {
+                if (options.queryParams) {
+                    //has value (check for key and value)
+                    if (options.queryParams[queryParamKey]) {
+                        LOG.debug(`checking query for ${queryParamKey} in ${JSON.stringify(request.query)}`)
+                        const v = this.getQueryParamValue(request, queryParamKey);
+                        LOG.debug(`found query value ${v} for ${queryParamKey}`)
+                        matches = matches && (v == options.queryParams[queryParamKey]);
+                    }
+                    //has only key (only check for key)
+                    else {
+                        matches = matches && this.containsQueryParam(request, queryParamKey);
+                    }
+                }
+            });
+        }
+        return matches;
+    }
+    private containsQueryParam(request: express.Request, param: string): boolean {
+        return this.getQueryParamValue(request, param) ? true : false;
+    }
+    private getQueryParamValue(request: express.Request, param: string): string | null {
+        const query = request.query;
+        const v = query[param];
+        return v ? v.toString() : null;
     }
     public registerCallback(options: IQueryOptions, callback: IHttpCallback) {
         this.callbacks.push({ options: options, callback: callback });
