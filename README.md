@@ -12,3 +12,24 @@ cli command to set master volume
 ```
 amixer -D pulse sset Master ${volume}%
 ```
+
+
+
+## build 
+
+  * build lib
+```
+cd lib
+npm run build
+```
+  * build foobar switch
+```
+cd foobar-switch
+npm run build
+```
+  * start foobar switch
+```
+cd foobar-switch
+npm run start
+```
+ 
